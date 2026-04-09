@@ -1,7 +1,6 @@
 import inquirer from "inquirer";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
-import { saveSessionId } from "../helpers/session.js"; // Импортируем функции
 
 dotenv.config();
 
@@ -22,10 +21,9 @@ const signup = async () => {
 
     const result = await response.json();
     if (response.ok) {
-      await saveSessionId(result.sessionId); // Сохраняем Session ID
-      console.log("Signup successful. Session ID saved.");
+      console.log("Signup successful:", result);
     } else {
-      console.error("Signup failed:", result.message);
+      console.error("Signup failed:", result);
     }
   } catch (error) {
     console.error("An error occurred during signup:", error.message);

@@ -1,12 +1,13 @@
 import inquirer from "inquirer";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
-import { saveSessionId } from "../helpers/session.js"; // Импортируем функции
+import { saveSessionId } from "../helpers/session.js";
 
 dotenv.config();
 
 const serverUri = process.env.SERVER;
 
+/** @returns {Promise<string|null>} sessionId on success */
 const login = async () => {
   try {
     const { username, password } = await inquirer.prompt([
@@ -21,14 +22,16 @@ const login = async () => {
     });
 
     const result = await response.json();
-    if (response.ok) {
-      await saveSessionId(result.sessionId); // Сохраняем Session ID
+    if (response.ok && !result.error) {
+      await saveSessionId(result.sessionId);
       console.log("Login successful. Session ID saved.");
-    } else {
-      console.error("Login failed:", result.message);
+      return result.sessionId;
     }
+    console.error("Login failed:", result.error || result);
+    return null;
   } catch (error) {
     console.error("An error occurred during login:", error.message);
+    return null;
   }
 };
 

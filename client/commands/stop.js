@@ -1,20 +1,31 @@
 import fetch from "node-fetch";
+import inquirer from "inquirer";
 import dotenv from "dotenv";
-import { getSessionId } from "../helpers/session.js"; // Импортируем функцию
+import { getSessionId } from "../helpers/session.js";
 
 dotenv.config();
 
 const serverUri = process.env.SERVER;
 
-const stop = async (timerId) => {
+const stop = async (timerIdArg) => {
   try {
-    const sessionId = await getSessionId(); // Читаем Session ID
+    const sessionId = await getSessionId();
+    if (!sessionId) {
+      console.error("No valid session found. Please log in first.");
+      return;
+    }
+
+    let timerId = timerIdArg;
+    if (!timerId) {
+      const answer = await inquirer.prompt([{ type: "input", name: "id", message: "Timer ID:" }]);
+      timerId = answer.id;
+    }
 
     const response = await fetch(`${serverUri}/api/timers/${timerId}/stop`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        SessionID: sessionId, // Добавляем Session ID в заголовок
+        SessionID: sessionId,
       },
     });
 

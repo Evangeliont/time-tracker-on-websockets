@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { nanoid } from "nanoid";
+import { notifyUserAllTimers } from "../wsTimers.mjs";
 
 const getTimers = async (req, res) => {
   try {
@@ -41,6 +42,7 @@ const createTimer = async (req, res) => {
     };
 
     await req.db.collection("timers").insertOne(newTimer);
+    await notifyUserAllTimers(userId);
     res.json({ id: newTimer.id });
   } catch (error) {
     console.error("Error creating timer:", error.message);
@@ -68,6 +70,7 @@ const stopTimer = async (req, res) => {
         .collection("timers")
         .updateOne({ id, userId: new ObjectId(userId) }, { $set: timer });
 
+      await notifyUserAllTimers(userId);
       res.status(200).send({});
     } else {
       res.status(404).json({ error: "Timer not found" });

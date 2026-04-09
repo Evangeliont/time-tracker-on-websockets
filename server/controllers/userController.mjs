@@ -32,6 +32,7 @@ const login = async (req, res) => {
 
     const sessionId = await createSession(req.db, user._id);
 
+    res.cookie("sessionId", sessionId, { httpOnly: true, sameSite: "lax", path: "/" });
     res.json({ sessionId });
   } catch (error) {
     res.status(403).json({ error: "Does not exist" });
@@ -45,6 +46,7 @@ const logout = async (req, res) => {
     }
 
     await deleteSession(req.db, req.sessionId);
+    res.clearCookie("sessionId", { path: "/" });
     res.json("Successfully logged out");
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });

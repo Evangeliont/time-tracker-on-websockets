@@ -12,15 +12,14 @@ export const requireAuth = () => async (req, res, next) => {
     });
   }
 
-  const sessionId = req.headers.sessionid || req.query.sessionId || req.cookies["sessionId"];
-  console.log("Session ID:", sessionId); // Добавляем логирование sessionId
+  const sessionId =
+    req.headers.sessionid || req.query.sessionId || (req.cookies && req.cookies.sessionId);
   if (!sessionId) {
     return res.status(403).json({ error: "Forbidden: No session ID provided" });
   }
 
   try {
     const user = await findUserBySessionId(req.db, sessionId);
-    console.log("Authenticated user:", user); // Добавляем логирование пользователя
     if (!user) {
       return res.status(403).json({ error: "Forbidden: Invalid session ID" });
     }

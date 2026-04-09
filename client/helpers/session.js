@@ -29,3 +29,13 @@ export const saveSessionId = async (sessionId) => {
     console.error("Error saving session file:", error.message);
   }
 };
+
+export const clearSessionId = async () => {
+  try {
+    await fs.unlink(sessionFileName);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      console.error("Error removing session file:", error.message);
+    }
+  }
+};
